@@ -1,26 +1,150 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class TodoItem extends Component
+{
+  constructor() {
+    super()
+    
+    this.handleChange = this.handleChange.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+
+  handleChange() {
+    this.props.toggle( this.props.id );
+  }
+
+  handleDelete() {
+    this.props.remove( this.props.id );
+  }
+
+  render() {
+    return (
+      <li>
+        <input type="checkbox" 
+          checked={this.props.status} 
+          onChange={this.handleChange} />
+        {this.props.status ? (
+          <s>{this.props.subject}</s>
+        ) : (
+          this.props.subject
+        )}   
+
+        <a href='#' onClick={this.handleDelete}>&times;</a>
+      </li>
+    )
+  }
 }
 
-export default App;
+class NewTodo extends Component 
+{
+  constructor() {
+    super();
+
+    this.state = {
+      subject: ''
+    };
+
+    this.handleAdd = this.handleAdd.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    this.setState({
+      subject: e.target.value
+    })
+  }
+
+  handleAdd() {
+    var subject = this.state.subject;
+    this.props.add( subject );
+
+    this.setState({ subject: '' });
+  }
+
+  render() {
+    return (
+      <div className='newtodo'>
+        <input type="text" 
+          onChange={this.handleChange} 
+          value={this.state.subject} />
+        <button onClick={this.handleAdd}>+</button>
+      </div>
+    )
+  }
+}
+
+class TodoList extends Component
+{
+  constructor() {
+    super()
+
+    this.state = {
+      items : [
+        { subject : 'Something to do', status: 0 },
+        { subject : 'Another Something to do', status: 0 },
+        { subject : 'Yet another thing to do', status: 1 },
+        { subject : 'More thing to do', status: 0 }
+      ]
+    }
+
+    this.toggle = this.toggle.bind(this);
+    this.remove = this.remove.bind(this);
+    this.add = this.add.bind(this);
+  }
+
+  add(subject) {
+    var items = this.state.items;
+    items.push({
+      subject: subject,
+      status: 0
+    });
+    this.setState({ items })
+  }
+
+  toggle(index) {
+    var items = this.state.items;
+    items[index].status = ! items[index].status;
+    this.setState({ items })
+  }
+
+  remove(index){
+    var items = this.state.items;
+    delete items[index];
+    this.setState({ items });
+  }
+
+  render() {
+    var self = this;
+
+    return (
+      <div>
+        <ul>
+          {this.state.items.map(function(item, index) {
+            return (
+              <TodoItem 
+                key={index}
+                id={index}
+                status={item.status}
+                subject={item.subject}
+                toggle={self.toggle}
+                remove={self.remove} />
+            )
+          })}
+        </ul>
+
+        <NewTodo add={self.add}/>
+      </div>
+    )
+  }
+}
+
+export default TodoList;
+
+//Internal state data
+//One way data flow (UI & data)
+//Component data fow
+//Prop key for React framework & not for us
+//delete is javascript keyword
+//previousSibling is javascipt dom selector
+//Redux is state container for larage project
